@@ -1,11 +1,12 @@
 package ch.leadrian.samp.kamp.textkeygen;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class TextKeysGeneratorPluginExtension {
 
     private Object resourcesDirectory;
-    private Set<String> packageNames;
+    private Set<String> packageNames = new HashSet<>();
 
     public Object getResourcesDirectory() {
         return resourcesDirectory;

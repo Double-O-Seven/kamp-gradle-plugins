@@ -119,7 +119,7 @@ public class GenerateTextKeysTask extends DefaultTask {
 
     @NotNull
     private String packageNameToPath(String packageName) {
-        return packageName.replaceAll("\\.", File.separator);
+        return packageName.replace('.', File.separatorChar);
     }
 
 }
