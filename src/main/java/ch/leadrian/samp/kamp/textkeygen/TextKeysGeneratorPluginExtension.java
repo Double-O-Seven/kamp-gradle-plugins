@@ -5,7 +5,7 @@ import java.util.Set;
 public class TextKeysGeneratorPluginExtension {
 
     private Object resourcesDirectory;
-    private Set<String> packages;
+    private Set<String> packageNames;
 
     public Object getResourcesDirectory() {
         return resourcesDirectory;
@@ -15,11 +15,11 @@ public class TextKeysGeneratorPluginExtension {
         this.resourcesDirectory = resourcesDirectory;
     }
 
-    public Set<String> getPackages() {
-        return packages;
+    public Set<String> getPackageNames() {
+        return packageNames;
     }
 
-    public void setPackages(Set<String> packages) {
-        this.packages = packages;
+    public void setPackageNames(Set<String> packageNames) {
+        this.packageNames = packageNames;
     }
 }

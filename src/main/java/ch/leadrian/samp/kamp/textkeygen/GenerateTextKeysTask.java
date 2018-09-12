@@ -32,7 +32,7 @@ public class GenerateTextKeysTask extends DefaultTask {
         TextKeysGeneratorPluginExtension extension = getExtension();
         File resourcesDirectoryFile = getResourcesDirectoryFile(extension.getResourcesDirectory());
         return extension
-                .getPackages()
+                .getPackageNames()
                 .stream()
                 .flatMap(packageName -> getStringsPropertiesFiles(resourcesDirectoryFile, packageName).stream())
                 .collect(toList());
@@ -40,13 +40,13 @@ public class GenerateTextKeysTask extends DefaultTask {
 
     @OutputDirectories
     public List<File> getOutputDirectories() {
-        return getExtension().getPackages().stream().map(this::getOutputDirectory).collect(toList());
+        return getExtension().getPackageNames().stream().map(this::getOutputDirectory).collect(toList());
     }
 
     private void generateTextKeys() {
         TextKeysGeneratorPluginExtension extension = getExtension();
         File resourcesDirectoryFile = getResourcesDirectoryFile(extension.getResourcesDirectory());
-        extension.getPackages().forEach(packageName -> {
+        extension.getPackageNames().forEach(packageName -> {
             List<File> stringsPropertiesFiles = getStringsPropertiesFiles(resourcesDirectoryFile, packageName);
             try {
                 generateTextKeys(packageName, stringsPropertiesFiles);
