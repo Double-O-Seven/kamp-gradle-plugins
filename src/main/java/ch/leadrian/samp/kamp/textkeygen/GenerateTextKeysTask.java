@@ -30,7 +30,7 @@ public class GenerateTextKeysTask extends DefaultTask {
     @InputFiles
     public List<File> getInputFiles() {
         TextKeysGeneratorPluginExtension extension = getExtension();
-        File resourcesDirectoryFile = getResourcesDirectoryFile(extension.getResourcesDirectory());
+        File resourcesDirectoryFile = getFileFromObject(extension.getResourcesDirectory());
         return extension
                 .getPackageNames()
                 .stream()
@@ -45,7 +45,7 @@ public class GenerateTextKeysTask extends DefaultTask {
 
     private void generateTextKeys() {
         TextKeysGeneratorPluginExtension extension = getExtension();
-        File resourcesDirectoryFile = getResourcesDirectoryFile(extension.getResourcesDirectory());
+        File resourcesDirectoryFile = getFileFromObject(extension.getResourcesDirectory());
         extension.getPackageNames().forEach(packageName -> {
             List<File> stringsPropertiesFiles = getStringsPropertiesFiles(resourcesDirectoryFile, packageName);
             try {
@@ -98,14 +98,14 @@ public class GenerateTextKeysTask extends DefaultTask {
         return properties;
     }
 
-    private File getResourcesDirectoryFile(Object resourcesDirectory) {
-        requireNonNull(resourcesDirectory);
-        if (resourcesDirectory instanceof Path) {
-            return ((Path) resourcesDirectory).toFile();
-        } else if (resourcesDirectory instanceof File) {
-            return (File) resourcesDirectory;
+    private File getFileFromObject(Object fileObject) {
+        requireNonNull(fileObject);
+        if (fileObject instanceof Path) {
+            return ((Path) fileObject).toFile();
+        } else if (fileObject instanceof File) {
+            return (File) fileObject;
         } else {
-            return new File(resourcesDirectory.toString());
+            return new File(fileObject.toString());
         }
     }
 
@@ -114,7 +114,7 @@ public class GenerateTextKeysTask extends DefaultTask {
     }
 
     private File getOutputDirectory(String packageName) {
-        return new File(getProject().getBuildDir(), packageNameToPath(packageName));
+        return new File(getFileFromObject(getExtension().getOutputDirectory()), packageNameToPath(packageName));
     }
 
     @NotNull
