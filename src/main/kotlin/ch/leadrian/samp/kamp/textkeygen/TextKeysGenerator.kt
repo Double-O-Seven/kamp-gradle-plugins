@@ -1,23 +1,14 @@
 package ch.leadrian.samp.kamp.textkeygen
 
-import java.io.File
 import java.io.Writer
-import java.nio.file.Files
-import java.nio.file.Files.newBufferedWriter
-import java.nio.file.Path
-import java.nio.file.StandardOpenOption.CREATE
-import java.nio.file.StandardOpenOption.WRITE
 
 class TextKeysGenerator {
 
-    fun generateTextKeyClasses(packageName: String, outputDirectory: Path, stringPropertyNames: Set<String>) {
-        Files.createDirectories(outputDirectory.resolve(packageName.replace("\\.".toRegex(), File.separator)))
-        newBufferedWriter(outputDirectory.resolve("TextKeys.java"), CREATE, WRITE).use { writer ->
-            writer.write("package $packageName\n\n")
-            writer.write("import ch.leadrian.samp.kamp.core.api.text.TextKey;\n\n")
-            val root = getTextKeyTree("TextKeys", stringPropertyNames.map { TextKey(it) })
-            root.write("", writer)
-        }
+    fun generateTextKeyClasses(rootClassName: String, packageName: String, stringPropertyNames: Set<String>, writer: Writer) {
+        writer.write("package $packageName;\n\n")
+        writer.write("import ch.leadrian.samp.kamp.core.api.text.TextKey;\n\n")
+        val root = getTextKeyTree(rootClassName, stringPropertyNames.map { TextKey(it) })
+        root.write("", writer)
     }
 
     private fun getTextKeyTree(parentSegment: String, textKeys: List<TextKey>): TextKeyTree {
@@ -26,7 +17,7 @@ class TextKeysGenerator {
                 valueTransform = { it.copy(propertyNameSegments = it.propertyNameSegments.drop(1)) }
         )
         val subtreesBySegment = mutableListOf<TextKeyTree>()
-        textKeysByFirstSegment.forEach { segment, groupedTextKeys ->
+        textKeysByFirstSegment.toSortedMap().forEach { segment, groupedTextKeys ->
             if (groupedTextKeys.size == 1) {
                 groupedTextKeys.first().apply {
                     subtreesBySegment += when {
@@ -62,14 +53,14 @@ class TextKeysGenerator {
         class Leaf(segment: String, val propertyName: String) : TextKeyTree(segment) {
 
             override fun write(indentation: String, writer: Writer) {
-                writer.write("${indentation}public static final String $segment = \"$propertyName\";\n")
-                writer.write("${indentation}public static final TextKey ${segment}TextKey = new TextKey(\"$propertyName\");\n\n")
+                writer.write("${indentation}public static final String ${segment}Name = \"$propertyName\";\n")
+                writer.write("${indentation}public static final TextKey $segment = new TextKey(${segment}Name);\n\n")
             }
         }
     }
 
     private data class TextKey(val propertyName: String, val propertyNameSegments: List<String>) {
-        constructor(propertyName: String) : this(propertyName, propertyName.split("\\.").toList())
+        constructor(propertyName: String) : this(propertyName, propertyName.split(".").toList())
     }
 
 }

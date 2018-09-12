@@ -3,13 +3,12 @@ package ch.leadrian.samp.kamp.textkeygen;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.OutputDirectories;
+import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
@@ -49,11 +48,15 @@ public class GenerateTextKeysTask extends DefaultTask {
         File resourcesDirectoryFile = getResourcesDirectoryFile(extension.getResourcesDirectory());
         extension.getPackages().forEach(packageName -> {
             List<File> stringsPropertiesFiles = getStringsPropertiesFiles(resourcesDirectoryFile, packageName);
-            generateTextKeys(packageName, stringsPropertiesFiles);
+            try {
+                generateTextKeys(packageName, stringsPropertiesFiles);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
         });
     }
 
-    private void generateTextKeys(String packageName, List<File> stringsPropertiesFiles) {
+    private void generateTextKeys(String packageName, List<File> stringsPropertiesFiles) throws IOException {
         Set<String> stringPropertyNames = stringsPropertiesFiles
                 .stream()
                 .map(File::toPath)
@@ -61,14 +64,18 @@ public class GenerateTextKeysTask extends DefaultTask {
                 .map(Properties::stringPropertyNames)
                 .flatMap(Set::stream)
                 .collect(toSet());
-        TextKeysGeneratorPluginExtension extension = getExtension();
         TextKeysGenerator textKeysGenerator = new TextKeysGenerator();
         Path outputDirectory = getOutputDirectory(packageName).toPath();
-        textKeysGenerator.generateTextKeyClasses(packageName, outputDirectory, stringPropertyNames);
+        Path packageDirectory = outputDirectory.resolve(packageNameToPath(packageName));
+
+        Files.createDirectories(packageDirectory);
+        try (Writer writer = Files.newBufferedWriter(packageDirectory.resolve("TextKeys.java"), StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
+            textKeysGenerator.generateTextKeyClasses("TextKeys", packageName, stringPropertyNames, writer);
+        }
     }
 
     private List<File> getStringsPropertiesFiles(File resourcesDirectoryFile, String packageName) {
-        String packagePath = packageName.replaceAll("\\.", File.separator);
+        String packagePath = packageNameToPath(packageName);
         try {
             return Files
                     .list(resourcesDirectoryFile.toPath().resolve(packagePath))
@@ -107,7 +114,12 @@ public class GenerateTextKeysTask extends DefaultTask {
     }
 
     private File getOutputDirectory(String packageName) {
-        return new File(getProject().getBuildDir(), packageName.replaceAll("\\.", File.separator));
+        return new File(getProject().getBuildDir(), packageNameToPath(packageName));
+    }
+
+    @NotNull
+    private String packageNameToPath(String packageName) {
+        return packageName.replaceAll("\\.", File.separator);
     }
 
 }
