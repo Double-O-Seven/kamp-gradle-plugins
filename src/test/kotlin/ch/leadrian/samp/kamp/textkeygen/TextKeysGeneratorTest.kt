@@ -55,8 +55,8 @@ internal class TextKeysGeneratorTest {
                                 "import ch.leadrian.samp.kamp.core.api.text.TextKey;\n\n" +
                                 "public final class TextKeys {\n\n" +
                                 "\tprivate TextKeys() {}\n\n" +
-                                "\tpublic static final String testName = \"test\";\n" +
-                                "\tpublic static final TextKey test = new TextKey(testName);\n\n" +
+                                "\tpublic static final String test_ = \"test\";\n" +
+                                "\tpublic static final TextKey test = new TextKey(test_);\n\n" +
                                 "}\n\n")
                 ),
                 GenerateTextKeyClassesArguments(
@@ -67,10 +67,10 @@ internal class TextKeysGeneratorTest {
                                 "import ch.leadrian.samp.kamp.core.api.text.TextKey;\n\n" +
                                 "public final class TextKeys {\n\n" +
                                 "\tprivate TextKeys() {}\n\n" +
-                                "\tpublic static final String test1Name = \"test1\";\n" +
-                                "\tpublic static final TextKey test1 = new TextKey(test1Name);\n\n" +
-                                "\tpublic static final String test2Name = \"test2\";\n" +
-                                "\tpublic static final TextKey test2 = new TextKey(test2Name);\n\n" +
+                                "\tpublic static final String test1_ = \"test1\";\n" +
+                                "\tpublic static final TextKey test1 = new TextKey(test1_);\n\n" +
+                                "\tpublic static final String test2_ = \"test2\";\n" +
+                                "\tpublic static final TextKey test2 = new TextKey(test2_);\n\n" +
                                 "}\n\n")
                 ),
                 GenerateTextKeyClassesArguments(
@@ -87,24 +87,24 @@ internal class TextKeysGeneratorTest {
                                 "import ch.leadrian.samp.kamp.core.api.text.TextKey;\n\n" +
                                 "public final class TextKeys {\n\n" +
                                 "\tprivate TextKeys() {}\n\n" +
-                                "\tpublic static final String test1Name = \"test1\";\n" +
-                                "\tpublic static final TextKey test1 = new TextKey(test1Name);\n\n" +
+                                "\tpublic static final String test1_ = \"test1\";\n" +
+                                "\tpublic static final TextKey test1 = new TextKey(test1_);\n\n" +
                                 "\tpublic static final class test2 {\n\n" +
                                 "\t\tprivate test2() {}\n\n" +
-                                "\t\tpublic static final String abcName = \"test2.abc\";\n" +
-                                "\t\tpublic static final TextKey abc = new TextKey(abcName);\n\n" +
+                                "\t\tpublic static final String abc_ = \"test2.abc\";\n" +
+                                "\t\tpublic static final TextKey abc = new TextKey(abc_);\n\n" +
                                 "\t\tpublic static final class xyz {\n\n" +
                                 "\t\t\tprivate xyz() {}\n\n" +
-                                "\t\t\tpublic static final String t1Name = \"test2.xyz.t1\";\n" +
-                                "\t\t\tpublic static final TextKey t1 = new TextKey(t1Name);\n\n" +
-                                "\t\t\tpublic static final String t2Name = \"test2.xyz.t2\";\n" +
-                                "\t\t\tpublic static final TextKey t2 = new TextKey(t2Name);\n\n" +
+                                "\t\t\tpublic static final String t1_ = \"test2.xyz.t1\";\n" +
+                                "\t\t\tpublic static final TextKey t1 = new TextKey(t1_);\n\n" +
+                                "\t\t\tpublic static final String t2_ = \"test2.xyz.t2\";\n" +
+                                "\t\t\tpublic static final TextKey t2 = new TextKey(t2_);\n\n" +
                                 "\t\t}\n\n" +
                                 "\t}\n\n" +
                                 "\tpublic static final class test3 {\n\n" +
                                 "\t\tprivate test3() {}\n\n" +
-                                "\t\tpublic static final String lolName = \"test3.lol\";\n" +
-                                "\t\tpublic static final TextKey lol = new TextKey(lolName);\n\n" +
+                                "\t\tpublic static final String lol_ = \"test3.lol\";\n" +
+                                "\t\tpublic static final TextKey lol = new TextKey(lol_);\n\n" +
                                 "\t}\n\n" +
                                 "}\n\n")
                 )

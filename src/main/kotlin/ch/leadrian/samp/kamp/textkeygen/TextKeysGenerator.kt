@@ -58,8 +58,8 @@ class TextKeysGenerator {
         class Leaf(segment: String, val propertyName: String) : TextKeyTree(segment) {
 
             override fun write(indentation: String, writer: Writer) {
-                writer.write("${indentation}public static final String ${segment}Name = \"$propertyName\";\n")
-                writer.write("${indentation}public static final TextKey $segment = new TextKey(${segment}Name);\n\n")
+                writer.write("${indentation}public static final String ${segment}_ = \"$propertyName\";\n")
+                writer.write("${indentation}public static final TextKey $segment = new TextKey(${segment}_);\n\n")
             }
         }
     }
