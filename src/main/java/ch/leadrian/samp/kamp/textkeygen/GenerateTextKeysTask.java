@@ -66,10 +66,9 @@ public class GenerateTextKeysTask extends DefaultTask {
                 .collect(toSet());
         TextKeysGenerator textKeysGenerator = new TextKeysGenerator();
         Path outputDirectory = getOutputDirectory(packageName).toPath();
-        Path packageDirectory = outputDirectory.resolve(packageNameToPath(packageName));
 
-        Files.createDirectories(packageDirectory);
-        try (Writer writer = Files.newBufferedWriter(packageDirectory.resolve("TextKeys.java"), StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
+        Files.createDirectories(outputDirectory);
+        try (Writer writer = Files.newBufferedWriter(outputDirectory.resolve("TextKeys.java"), StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
             textKeysGenerator.generateTextKeyClasses("TextKeys", packageName, stringPropertyNames, writer);
         }
     }
