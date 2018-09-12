@@ -8,6 +8,7 @@ class TextKeysGenerator {
         writer.write("package $packageName;\n\n")
         writer.write("import ch.leadrian.samp.kamp.core.api.text.TextKey;\n\n")
         val root = getTextKeyTree(rootClassName, stringPropertyNames.map { TextKey(it) })
+        root.isRoot = true
         root.write("", writer)
     }
 
@@ -34,14 +35,18 @@ class TextKeysGenerator {
         return TextKeyTree.Node(parentSegment, subtreesBySegment)
     }
 
-    private sealed class TextKeyTree(val segment: String) {
+    private sealed class TextKeyTree(val segment: String, var isRoot: Boolean = false) {
 
         abstract fun write(indentation: String, writer: Writer)
 
         class Node(segment: String, val subtrees: List<TextKeyTree>) : TextKeyTree(segment) {
 
             override fun write(indentation: String, writer: Writer) {
-                writer.write("${indentation}public final class $segment {\n\n")
+                if (isRoot) {
+                    writer.write("${indentation}public final class $segment {\n\n")
+                } else {
+                    writer.write("${indentation}public static final class $segment {\n\n")
+                }
                 writer.write("$indentation\tprivate $segment() {}\n\n")
                 subtrees.forEach {
                     it.write("$indentation\t", writer)

@@ -89,11 +89,11 @@ internal class TextKeysGeneratorTest {
                                 "\tprivate TextKeys() {}\n\n" +
                                 "\tpublic static final String test1Name = \"test1\";\n" +
                                 "\tpublic static final TextKey test1 = new TextKey(test1Name);\n\n" +
-                                "\tpublic final class test2 {\n\n" +
+                                "\tpublic static final class test2 {\n\n" +
                                 "\t\tprivate test2() {}\n\n" +
                                 "\t\tpublic static final String abcName = \"test2.abc\";\n" +
                                 "\t\tpublic static final TextKey abc = new TextKey(abcName);\n\n" +
-                                "\t\tpublic final class xyz {\n\n" +
+                                "\t\tpublic static final class xyz {\n\n" +
                                 "\t\t\tprivate xyz() {}\n\n" +
                                 "\t\t\tpublic static final String t1Name = \"test2.xyz.t1\";\n" +
                                 "\t\t\tpublic static final TextKey t1 = new TextKey(t1Name);\n\n" +
@@ -101,7 +101,7 @@ internal class TextKeysGeneratorTest {
                                 "\t\t\tpublic static final TextKey t2 = new TextKey(t2Name);\n\n" +
                                 "\t\t}\n\n" +
                                 "\t}\n\n" +
-                                "\tpublic final class test3 {\n\n" +
+                                "\tpublic static final class test3 {\n\n" +
                                 "\t\tprivate test3() {}\n\n" +
                                 "\t\tpublic static final String lolName = \"test3.lol\";\n" +
                                 "\t\tpublic static final TextKey lol = new TextKey(lolName);\n\n" +
