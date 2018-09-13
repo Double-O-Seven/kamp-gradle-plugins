@@ -1,4 +1,4 @@
-package ch.leadrian.samp.kamp.textkeygen;
+package ch.leadrian.samp.kamp.gradle.plugin.textkeygen;
 
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.InputFiles;

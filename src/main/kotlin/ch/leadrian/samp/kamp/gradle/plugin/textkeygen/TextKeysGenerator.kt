@@ -1,12 +1,16 @@
-package ch.leadrian.samp.kamp.textkeygen
+package ch.leadrian.samp.kamp.gradle.plugin.textkeygen
 
 import java.io.Writer
+import javax.annotation.Generated
 
 class TextKeysGenerator {
 
+    @Generated
     fun generateTextKeyClasses(rootClassName: String, packageName: String, stringPropertyNames: Set<String>, writer: Writer) {
         writer.write("package $packageName;\n\n")
-        writer.write("import ch.leadrian.samp.kamp.core.api.text.TextKey;\n\n")
+        writer.write("import ch.leadrian.samp.kamp.core.api.text.TextKey;\n")
+        writer.write("import javax.annotation.Generated;\n\n")
+        writer.write("@Generated(\n\tvalue = \"${this::class.java.name}\"\n)\n")
         val root = getTextKeyTree(rootClassName, stringPropertyNames.map { TextKey(it) })
         root.isRoot = true
         root.write("", writer)
