@@ -1,5 +1,5 @@
 version "${version}"
-group 'ch.leadrian.samp.kamp.textkeygen'
+group 'ch.leadrian.samp.kamp'
 
 buildscript {
     ext {

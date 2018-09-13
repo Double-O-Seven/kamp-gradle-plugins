@@ -1,8 +1,8 @@
 package ch.leadrian.samp.kamp.gradle.plugin.textkeygen
 
-import java.util.HashSet
+import java.util.*
 
-class TextKeysGeneratorPluginExtension {
+open class TextKeysGeneratorPluginExtension {
 
     var outputDirectory: Any? = null
     var resourcesDirectory: Any? = null

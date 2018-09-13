@@ -5,7 +5,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 
 @NonNullApi
-class TextKeysGeneratorPlugin : Plugin<Project> {
+open class TextKeysGeneratorPlugin : Plugin<Project> {
 
     override fun apply(project: Project) {
         project.extensions.create("textKeyGenerator", TextKeysGeneratorPluginExtension::class.java)
