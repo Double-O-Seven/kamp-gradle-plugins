@@ -6,6 +6,7 @@ import org.gradle.api.tasks.OutputDirectories;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -89,7 +90,7 @@ public class GenerateTextKeysTask extends DefaultTask {
 
     private Properties loadProperties(Path path) {
         Properties properties = new Properties();
-        try (Reader reader = Files.newBufferedReader(path)) {
+        try (Reader reader = Files.newBufferedReader(path, StandardCharsets.ISO_8859_1)) {
             properties.load(reader);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
