@@ -3,8 +3,8 @@ group 'ch.leadrian.samp.kamp'
 
 buildscript {
     ext {
-        kotlin_version = '1.2.61'
-        junit_version = '5.2.0'
+        kotlin_version = '1.2.71'
+        junit_version = '5.3.0'
     }
 
     repositories {
@@ -44,12 +44,12 @@ compileTestKotlin {
 
 dependencies {
 
-    compile(
+    implementation(
             "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version",
-			gradleApi()
+            gradleApi()
     )
 
-    testCompile(
+    testImplementation(
             "org.junit.jupiter:junit-jupiter-api:$junit_version",
             "org.junit.jupiter:junit-jupiter-params:$junit_version",
             'org.assertj:assertj-core:3.10.0'
