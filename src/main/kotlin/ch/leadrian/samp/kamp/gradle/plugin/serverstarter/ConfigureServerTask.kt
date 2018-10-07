@@ -129,6 +129,8 @@ open class ConfigureServerTask : DefaultTask() {
             with(writer) {
                 val gameModeClassName = extension.gameModeClassName ?: throw IllegalStateException("gameModeClassName was not set")
                 write("kamp.gamemode.class.name=$gameModeClassName\n")
+                val pluginName = kampPluginBinaryFile.fileName.toString().replace(".dll", "", ignoreCase = true)
+                write("kamp.plugin.name=$pluginName\n")
                 extension.configProperties.forEach { key, value ->
                     write("$key=$value\n")
                 }
