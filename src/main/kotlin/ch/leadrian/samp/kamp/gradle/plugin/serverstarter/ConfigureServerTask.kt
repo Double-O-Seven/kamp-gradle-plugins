@@ -21,7 +21,7 @@ open class ConfigureServerTask : DefaultTask() {
     private val kampDirectory = serverDirectory.resolve("Kamp")
     private val dataDirectory = kampDirectory.resolve("data")
     private val launchDirectory = kampDirectory.resolve("launch")
-    private val jarsDirectory = launchDirectory.resolve("launch")
+    private val jarsDirectory = launchDirectory.resolve("jars")
     private val pluginsDirectory = serverDirectory.resolve("plugins")
     private val serverCfgFile: Path = serverDirectory.resolve("server.cfg")
     private val jvmOptsFile = launchDirectory.resolve("jvmopts.txt")
