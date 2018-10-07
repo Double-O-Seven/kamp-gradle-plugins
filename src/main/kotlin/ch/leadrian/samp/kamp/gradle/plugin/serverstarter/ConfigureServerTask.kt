@@ -1,5 +1,6 @@
 package ch.leadrian.samp.kamp.gradle.plugin.serverstarter
 
+import com.google.common.io.Resources
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.tasks.InputFiles
@@ -18,7 +19,16 @@ import java.util.stream.Collectors.joining
 
 open class ConfigureServerTask : DefaultTask() {
 
-    private val serverDirectory = project.buildDir.toPath().resolve(ServerStarterPlugin.SERVER_DIRECTORY_NAME)
+    private val serverDirectory: Path by lazy {
+        val serverDirectoryBase = project.buildDir.toPath().resolve(ServerStarterPlugin.SERVER_DIRECTORY_NAME)
+        if (OperatingSystem.current().isLinux) {
+            serverDirectoryBase.resolve("samp03")
+        } else {
+            serverDirectoryBase
+        }
+    }
+    private val gameModesDirectory = serverDirectory.resolve("gamemodes")
+    private val kampAmxFile = gameModesDirectory.resolve("kamp.amx")
     private val kampDirectory = serverDirectory.resolve("Kamp")
     private val dataDirectory = kampDirectory.resolve("data")
     private val launchDirectory = kampDirectory.resolve("launch")
@@ -53,6 +63,7 @@ open class ConfigureServerTask : DefaultTask() {
         val outputFiles: MutableList<File> = mutableListOf()
         outputFiles += serverCfgFile.toFile()
         outputFiles += kampPluginBinaryFile.toFile()
+        outputFiles += kampAmxFile.toFile()
         return outputFiles
     }
 
@@ -67,6 +78,7 @@ open class ConfigureServerTask : DefaultTask() {
         createJvmOptsFile()
         createConfigPropertiesFile()
         copyPluginBinaryFile()
+        copyPawnScript()
     }
 
     private fun createDirectories() {
@@ -97,7 +109,7 @@ open class ConfigureServerTask : DefaultTask() {
                 write("maxplayers ${extension.maxPlayers}\n")
                 write("port ${extension.port}\n")
                 write("hostname ${extension.hostName}\n")
-                write("gamemode0 bare 1\n")
+                write("gamemode0 kamp 1\n")
                 val pluginFileName = kampPluginBinaryFile.fileName.toString()
                 when {
                     OperatingSystem.current().isWindows -> {
@@ -161,6 +173,13 @@ open class ConfigureServerTask : DefaultTask() {
 
     private fun copyPluginBinaryFile() {
         Files.copy(kampPluginBinaryFile, pluginsDirectory.resolve(kampPluginBinaryFile.fileName), StandardCopyOption.REPLACE_EXISTING)
+    }
+
+    private fun copyPawnScript() {
+        val kampAmx = Resources.toByteArray(Resources.getResource(this::class.java, "kamp.amx"))
+        Files.newOutputStream(kampAmxFile, StandardOpenOption.CREATE, StandardOpenOption.WRITE).use {
+            it.write(kampAmx)
+        }
     }
 
 }

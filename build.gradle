@@ -56,6 +56,7 @@ dependencies {
             "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version",
             'de.undercouch:gradle-download-task:3.4.3',
             'org.apache.commons:commons-lang3:3.8.1',
+            'com.google.guava:guava:26.0-jre',
 
             gradleApi()
     )
