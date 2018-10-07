@@ -80,13 +80,15 @@ open class ConfigureServerTask : DefaultTask() {
         // Need to delete old jars in case they're outdated regarding version
         Files.list(jarsDirectory).filter { Files.isRegularFile(it) }.forEach { Files.delete(it) }
         runtimeConfiguration.resolve().forEach {
-            Files.copy(it.toPath(), jarsDirectory)
+            val jarFile = it.toPath()
+            Files.copy(jarFile, jarsDirectory.resolve(jarFile.fileName))
         }
-        Files.copy(jarTask.archivePath.toPath(), jarsDirectory)
+        val archivePath = jarTask.archivePath.toPath()
+        Files.copy(archivePath, jarsDirectory.resolve(archivePath.fileName))
     }
 
     private fun writeServerCfg() {
-        Files.newBufferedWriter(serverCfgFile, StandardOpenOption.WRITE).use { writer ->
+        Files.newBufferedWriter(serverCfgFile, StandardOpenOption.WRITE, StandardOpenOption.CREATE).use { writer ->
             with(writer) {
                 write("echo Executing Server Config...\n")
                 write("lanmode ${extension.lanMode.toInt()}\n")
@@ -145,7 +147,7 @@ open class ConfigureServerTask : DefaultTask() {
     }
 
     private fun copyPluginBinaryFile() {
-        Files.copy(kampPluginBinaryFile, pluginsDirectory, StandardCopyOption.REPLACE_EXISTING)
+        Files.copy(kampPluginBinaryFile, pluginsDirectory.resolve(kampPluginBinaryFile.fileName), StandardCopyOption.REPLACE_EXISTING)
     }
 
 }

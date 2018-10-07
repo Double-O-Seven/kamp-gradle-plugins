@@ -18,7 +18,7 @@ open class ServerStarterPluginExtension {
 
     var lanMode: Boolean = false
 
-    var rconPassword: String = RandomStringUtils.random(8)
+    var rconPassword: String = RandomStringUtils.random(8, true, true)
 
     var maxPlayers: Int = 100
 
