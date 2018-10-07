@@ -14,6 +14,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.nio.file.StandardOpenOption
+import java.util.stream.Collectors.joining
 
 open class ConfigureServerTask : DefaultTask() {
 
@@ -138,6 +139,8 @@ open class ConfigureServerTask : DefaultTask() {
     private fun createJvmOptsFile() {
         Files.newBufferedWriter(jvmOptsFile, StandardOpenOption.WRITE, StandardOpenOption.CREATE).use { writer ->
             with(writer) {
+                val classPath = buildClassPath()
+                write("-Djava.class.path=$classPath\n")
                 extension.jvmOptions.forEach {
                     write(it)
                     write("\n")
@@ -145,6 +148,14 @@ open class ConfigureServerTask : DefaultTask() {
             }
         }
     }
+
+    private fun buildClassPath(): String =
+            Files
+                    .list(jarsDirectory)
+                    .filter { Files.isRegularFile(it) }
+                    .map { serverDirectory.relativize(it).toString() }
+                    .filter { it.endsWith(".jar", ignoreCase = true) }
+                    .collect(joining(";"))
 
     private fun copyPluginBinaryFile() {
         Files.copy(kampPluginBinaryFile, pluginsDirectory.resolve(kampPluginBinaryFile.fileName), StandardCopyOption.REPLACE_EXISTING)
