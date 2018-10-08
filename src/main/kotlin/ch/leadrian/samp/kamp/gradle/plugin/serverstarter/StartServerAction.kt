@@ -15,8 +15,7 @@ open class StartServerAction : Action<Exec> {
         }
         val commandLine = when {
             OperatingSystem.current().isWindows -> serverDirectory.resolve("samp-server.exe").toString()
-            OperatingSystem.current().isLinux -> serverDirectory.resolve("samp03svr").toString()
-            else -> throw UnsupportedOperationException("Unsupported operating system: ${OperatingSystem.current()}")
+            else -> serverDirectory.resolve("samp03svr").toString()
         }
         exec.workingDir(serverDirectory)
         exec.commandLine(commandLine)

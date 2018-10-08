@@ -116,8 +116,7 @@ open class ConfigureServerTask : DefaultTask() {
                         val pluginName = pluginFileName.replace(".dll", "", ignoreCase = true)
                         write("plugins $pluginName\n")
                     }
-                    OperatingSystem.current().isLinux -> write("plugins $pluginFileName\n")
-                    else -> throw UnsupportedOperationException("Unsupported operating system: ${OperatingSystem.current()}")
+                    else -> write("plugins $pluginFileName\n")
                 }
                 write("announce ${extension.announce.toInt()}\n")
                 write("chatlogging ${extension.chatLogging.toInt()}\n")

@@ -12,8 +12,7 @@ open class DownloadServerAction : Action<Download> {
             val extension = project.extensions.getByType(ServerStarterPluginExtension::class.java)
             val downloadUrl = when {
                 OperatingSystem.current().isWindows -> extension.windowsServerDownloadUrl
-                OperatingSystem.current().isLinux -> extension.linuxServerDownloadUrl
-                else -> throw UnsupportedOperationException("Unsupported operating system: ${OperatingSystem.current()}")
+                else -> extension.linuxServerDownloadUrl
             }
             val serverDirectory = project.buildDir.toPath().resolve(ServerStarterPlugin.SERVER_DIRECTORY_NAME)
             Files.createDirectories(serverDirectory)
