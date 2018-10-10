@@ -39,49 +39,51 @@ internal class TextKeysGeneratorTest {
         override fun provideArguments(context: ExtensionContext?): Stream<GenerateTextKeyClassesArguments> = Stream.of(
                 GenerateTextKeyClassesArguments(
                         rootClassName = "TextKeys",
-                        packageName = "ch.leadrian.samp.kamp.core.api.text",
+                        packageName = "ch.leadrian.samp.kamp.core.api.text.test",
                         stringPropertyNames = setOf(),
-                        expectedClassString = ("package ch.leadrian.samp.kamp.core.api.text;\n\n" +
-                                "import ch.leadrian.samp.kamp.core.api.text.TextKey;\n" +
+                        expectedClassString = ("package ch.leadrian.samp.kamp.core.api.text.test;\n\n" +
                                 "import javax.annotation.Generated;\n\n" +
-                                "@Generated(\n\tvalue = \"ch.leadrian.samp.kamp.gradle.plugin.textkeygen.TextKeysGenerator\"\n)\n" +
-                                "public final class TextKeys {\n\n" +
-                                "\tprivate TextKeys() {}\n\n" +
-                                "}\n\n")
+                                "@Generated(\"ch.leadrian.samp.kamp.gradle.plugin.textkeygen.TextKeysGenerator\")\n" +
+                                "public final class TextKeys {\n" +
+                                "  private TextKeys() {\n" +
+                                "  }\n" +
+                                "}\n")
                 ),
                 GenerateTextKeyClassesArguments(
                         rootClassName = "TextKeys",
-                        packageName = "ch.leadrian.samp.kamp.core.api.text",
+                        packageName = "ch.leadrian.samp.kamp.core.api.text.test",
                         stringPropertyNames = setOf("test"),
-                        expectedClassString = ("package ch.leadrian.samp.kamp.core.api.text;\n\n" +
+                        expectedClassString = ("package ch.leadrian.samp.kamp.core.api.text.test;\n\n" +
                                 "import ch.leadrian.samp.kamp.core.api.text.TextKey;\n" +
                                 "import javax.annotation.Generated;\n\n" +
-                                "@Generated(\n\tvalue = \"ch.leadrian.samp.kamp.gradle.plugin.textkeygen.TextKeysGenerator\"\n)\n" +
-                                "public final class TextKeys {\n\n" +
-                                "\tprivate TextKeys() {}\n\n" +
-                                "\tpublic static final String test_ = \"test\";\n" +
-                                "\tpublic static final TextKey test = new TextKey(test_);\n\n" +
-                                "}\n\n")
+                                "@Generated(\"ch.leadrian.samp.kamp.gradle.plugin.textkeygen.TextKeysGenerator\")\n" +
+                                "public final class TextKeys {\n" +
+                                "  public static final String test_ = \"test\";\n\n" +
+                                "  public static final TextKey test = new TextKey(test_);\n\n" +
+                                "  private TextKeys() {\n" +
+                                "  }\n" +
+                                "}\n")
                 ),
                 GenerateTextKeyClassesArguments(
                         rootClassName = "TextKeys",
-                        packageName = "ch.leadrian.samp.kamp.core.api.text",
+                        packageName = "ch.leadrian.samp.kamp.core.api.text.test",
                         stringPropertyNames = setOf("test2", "test1"),
-                        expectedClassString = ("package ch.leadrian.samp.kamp.core.api.text;\n\n" +
+                        expectedClassString = ("package ch.leadrian.samp.kamp.core.api.text.test;\n\n" +
                                 "import ch.leadrian.samp.kamp.core.api.text.TextKey;\n" +
                                 "import javax.annotation.Generated;\n\n" +
-                                "@Generated(\n\tvalue = \"ch.leadrian.samp.kamp.gradle.plugin.textkeygen.TextKeysGenerator\"\n)\n" +
-                                "public final class TextKeys {\n\n" +
-                                "\tprivate TextKeys() {}\n\n" +
-                                "\tpublic static final String test1_ = \"test1\";\n" +
-                                "\tpublic static final TextKey test1 = new TextKey(test1_);\n\n" +
-                                "\tpublic static final String test2_ = \"test2\";\n" +
-                                "\tpublic static final TextKey test2 = new TextKey(test2_);\n\n" +
-                                "}\n\n")
+                                "@Generated(\"ch.leadrian.samp.kamp.gradle.plugin.textkeygen.TextKeysGenerator\")\n" +
+                                "public final class TextKeys {\n" +
+                                "  public static final String test1_ = \"test1\";\n\n" +
+                                "  public static final TextKey test1 = new TextKey(test1_);\n\n" +
+                                "  public static final String test2_ = \"test2\";\n\n" +
+                                "  public static final TextKey test2 = new TextKey(test2_);\n\n" +
+                                "  private TextKeys() {\n" +
+                                "  }\n" +
+                                "}\n")
                 ),
                 GenerateTextKeyClassesArguments(
                         rootClassName = "TextKeys",
-                        packageName = "ch.leadrian.samp.kamp.core.api.text",
+                        packageName = "ch.leadrian.samp.kamp.core.api.text.test",
                         stringPropertyNames = setOf(
                                 "test2.abc",
                                 "test2.xyz.t1",
@@ -89,32 +91,36 @@ internal class TextKeysGeneratorTest {
                                 "test1",
                                 "test3.lol"
                         ),
-                        expectedClassString = ("package ch.leadrian.samp.kamp.core.api.text;\n\n" +
+                        expectedClassString = ("package ch.leadrian.samp.kamp.core.api.text.test;\n\n" +
                                 "import ch.leadrian.samp.kamp.core.api.text.TextKey;\n" +
                                 "import javax.annotation.Generated;\n\n" +
-                                "@Generated(\n\tvalue = \"ch.leadrian.samp.kamp.gradle.plugin.textkeygen.TextKeysGenerator\"\n)\n" +
-                                "public final class TextKeys {\n\n" +
-                                "\tprivate TextKeys() {}\n\n" +
-                                "\tpublic static final String test1_ = \"test1\";\n" +
-                                "\tpublic static final TextKey test1 = new TextKey(test1_);\n\n" +
-                                "\tpublic static final class test2 {\n\n" +
-                                "\t\tprivate test2() {}\n\n" +
-                                "\t\tpublic static final String abc_ = \"test2.abc\";\n" +
-                                "\t\tpublic static final TextKey abc = new TextKey(abc_);\n\n" +
-                                "\t\tpublic static final class xyz {\n\n" +
-                                "\t\t\tprivate xyz() {}\n\n" +
-                                "\t\t\tpublic static final String t1_ = \"test2.xyz.t1\";\n" +
-                                "\t\t\tpublic static final TextKey t1 = new TextKey(t1_);\n\n" +
-                                "\t\t\tpublic static final String t2_ = \"test2.xyz.t2\";\n" +
-                                "\t\t\tpublic static final TextKey t2 = new TextKey(t2_);\n\n" +
-                                "\t\t}\n\n" +
-                                "\t}\n\n" +
-                                "\tpublic static final class test3 {\n\n" +
-                                "\t\tprivate test3() {}\n\n" +
-                                "\t\tpublic static final String lol_ = \"test3.lol\";\n" +
-                                "\t\tpublic static final TextKey lol = new TextKey(lol_);\n\n" +
-                                "\t}\n\n" +
-                                "}\n\n")
+                                "@Generated(\"ch.leadrian.samp.kamp.gradle.plugin.textkeygen.TextKeysGenerator\")\n" +
+                                "public final class TextKeys {\n" +
+                                "  public static final String test1_ = \"test1\";\n\n" +
+                                "  public static final TextKey test1 = new TextKey(test1_);\n\n" +
+                                "  private TextKeys() {\n" +
+                                "  }\n\n" +
+                                "  public static final class test2 {\n" +
+                                "    public static final String abc_ = \"test2.abc\";\n\n" +
+                                "    public static final TextKey abc = new TextKey(abc_);\n\n" +
+                                "    private test2() {\n" +
+                                "    }\n\n" +
+                                "    public static final class xyz {\n" +
+                                "      public static final String t1_ = \"test2.xyz.t1\";\n\n" +
+                                "      public static final TextKey t1 = new TextKey(t1_);\n\n" +
+                                "      public static final String t2_ = \"test2.xyz.t2\";\n\n" +
+                                "      public static final TextKey t2 = new TextKey(t2_);\n\n" +
+                                "      private xyz() {\n" +
+                                "      }\n" +
+                                "    }\n" +
+                                "  }\n\n" +
+                                "  public static final class test3 {\n" +
+                                "    public static final String lol_ = \"test3.lol\";\n\n" +
+                                "    public static final TextKey lol = new TextKey(lol_);\n\n" +
+                                "    private test3() {\n" +
+                                "    }\n" +
+                                "  }\n" +
+                                "}\n")
                 )
         )
 

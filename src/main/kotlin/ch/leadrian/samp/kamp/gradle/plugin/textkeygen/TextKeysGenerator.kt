@@ -1,22 +1,39 @@
 package ch.leadrian.samp.kamp.gradle.plugin.textkeygen
 
+import com.squareup.javapoet.*
 import java.io.Writer
 import javax.annotation.Generated
+import javax.lang.model.element.Modifier
 
 class TextKeysGenerator {
 
-    @Generated
-    fun generateTextKeyClasses(rootClassName: String, packageName: String, stringPropertyNames: Set<String>, writer: Writer) {
-        writer.write("package $packageName;\n\n")
-        writer.write("import ch.leadrian.samp.kamp.core.api.text.TextKey;\n")
-        writer.write("import javax.annotation.Generated;\n\n")
-        writer.write("@Generated(\n\tvalue = \"${this::class.java.name}\"\n)\n")
-        val root = getTextKeyTree(rootClassName, stringPropertyNames.map { TextKey(it) })
-        root.isRoot = true
-        root.write("", writer)
+    companion object {
+
+        private val textKeyTypeSpec = ClassName.get("ch.leadrian.samp.kamp.core.api.text", "TextKey")
     }
 
-    private fun getTextKeyTree(parentSegment: String, textKeys: List<TextKey>): TextKeyTree {
+    @Generated
+    fun generateTextKeyClasses(rootClassName: String, packageName: String, stringPropertyNames: Set<String>, writer: Writer) {
+        val rootTypeSpecBuilder = TypeSpec
+                .classBuilder(rootClassName)
+                .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                .addAnnotation(AnnotationSpec
+                        .builder(Generated::class.java)
+                        .addMember("value", "\$S", this::class.java.name)
+                        .build())
+                .addMethod(MethodSpec
+                        .constructorBuilder()
+                        .addModifiers(Modifier.PRIVATE)
+                        .build())
+        getTextKeyTrees(stringPropertyNames.map { TextKey(it) }).forEach { it.write(rootTypeSpecBuilder) }
+        val javaFile = JavaFile
+                .builder(packageName, rootTypeSpecBuilder.build())
+                .skipJavaLangImports(true)
+                .build()
+        javaFile.writeTo(writer)
+    }
+
+    private fun getTextKeyTrees(textKeys: List<TextKey>): List<TextKeyTree> {
         val textKeysByFirstSegment = textKeys.groupBy(
                 keySelector = { it.propertyNameSegments.first() },
                 valueTransform = { it.copy(propertyNameSegments = it.propertyNameSegments.drop(1)) }
@@ -26,44 +43,50 @@ class TextKeysGenerator {
             if (groupedTextKeys.size == 1) {
                 groupedTextKeys.first().apply {
                     subtreesBySegment += when {
-                        propertyNameSegments.isEmpty() -> TextKeyTree.Leaf(segment, propertyName)
-                        else -> getTextKeyTree(segment, listOf(this))
+                        propertyNameSegments.isEmpty() -> listOf(TextKeyTree.Leaf(segment, propertyName))
+                        else -> listOf(TextKeyTree.Node(segment, getTextKeyTrees(listOf(this))))
                     }
                 }
             } else {
                 val leaf = groupedTextKeys.find { it.propertyNameSegments.isEmpty() }
                 if (leaf != null) throw IllegalStateException("Property ${leaf.propertyName} cannot be a prefix of other properties")
-                subtreesBySegment += getTextKeyTree(segment, groupedTextKeys)
+                subtreesBySegment += listOf(TextKeyTree.Node(segment, getTextKeyTrees(groupedTextKeys)))
             }
         }
-        return TextKeyTree.Node(parentSegment, subtreesBySegment)
+        return subtreesBySegment
     }
 
-    private sealed class TextKeyTree(val segment: String, var isRoot: Boolean = false) {
+    private sealed class TextKeyTree(val segment: String) {
 
-        abstract fun write(indentation: String, writer: Writer)
+        abstract fun write(typeSpecBuilder: TypeSpec.Builder)
 
         class Node(segment: String, val subtrees: List<TextKeyTree>) : TextKeyTree(segment) {
 
-            override fun write(indentation: String, writer: Writer) {
-                if (isRoot) {
-                    writer.write("${indentation}public final class $segment {\n\n")
-                } else {
-                    writer.write("${indentation}public static final class $segment {\n\n")
-                }
-                writer.write("$indentation\tprivate $segment() {}\n\n")
-                subtrees.forEach {
-                    it.write("$indentation\t", writer)
-                }
-                writer.write("$indentation}\n\n")
+            override fun write(typeSpecBuilder: TypeSpec.Builder) {
+                val nestedTypeSpecBuilder = TypeSpec
+                        .classBuilder(segment)
+                        .addModifiers(Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+                        .addMethod(MethodSpec
+                                .constructorBuilder()
+                                .addModifiers(Modifier.PRIVATE)
+                                .build())
+                subtrees.forEach { it.write(nestedTypeSpecBuilder) }
+                typeSpecBuilder.addType(nestedTypeSpecBuilder.build())
             }
         }
 
         class Leaf(segment: String, val propertyName: String) : TextKeyTree(segment) {
 
-            override fun write(indentation: String, writer: Writer) {
-                writer.write("${indentation}public static final String ${segment}_ = \"$propertyName\";\n")
-                writer.write("${indentation}public static final TextKey $segment = new TextKey(${segment}_);\n\n")
+            override fun write(typeSpecBuilder: TypeSpec.Builder) {
+                val stringFieldSpec = FieldSpec
+                        .builder(String::class.java, "${segment}_", Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+                        .initializer("\$S", propertyName)
+                        .build()
+                typeSpecBuilder.addField(stringFieldSpec)
+                typeSpecBuilder.addField(FieldSpec
+                        .builder(textKeyTypeSpec, segment, Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+                        .initializer("new \$T(\$N)", textKeyTypeSpec, stringFieldSpec)
+                        .build())
             }
         }
     }

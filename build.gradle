@@ -57,6 +57,7 @@ dependencies {
             'de.undercouch:gradle-download-task:3.4.3',
             'org.apache.commons:commons-lang3:3.8.1',
             'com.google.guava:guava:26.0-jre',
+            'com.squareup:javapoet:1.11.1',
 
             gradleApi()
     )
