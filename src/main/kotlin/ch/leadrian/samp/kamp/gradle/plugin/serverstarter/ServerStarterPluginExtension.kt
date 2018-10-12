@@ -1,6 +1,8 @@
 package ch.leadrian.samp.kamp.gradle.plugin.serverstarter
 
 import org.apache.commons.lang3.RandomStringUtils
+import org.gradle.internal.os.OperatingSystem
+import java.net.URI
 
 open class ServerStarterPluginExtension {
 
@@ -11,6 +13,15 @@ open class ServerStarterPluginExtension {
     var windowsServerDownloadUrl: String = "http://files.sa-mp.com/samp037_svr_R2-1-1_win32.zip"
 
     var linuxServerDownloadUrl: String = "http://files.sa-mp.com/samp037svr_R2-1.tar.gz"
+
+    val downloadUrl: String
+        get() = when {
+            OperatingSystem.current().isWindows -> windowsServerDownloadUrl
+            else -> linuxServerDownloadUrl
+        }
+
+    val downloadFileName: String
+        get() = URI(downloadUrl).toURL().file.substring(1)
 
     var kampPluginBinaryPath: String? = null
 

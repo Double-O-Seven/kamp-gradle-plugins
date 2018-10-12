@@ -4,6 +4,7 @@ import de.undercouch.gradle.tasks.download.Download
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.Exec
+import org.gradle.jvm.tasks.Jar
 
 open class ServerStarterPlugin : Plugin<Project> {
 
@@ -18,6 +19,7 @@ open class ServerStarterPlugin : Plugin<Project> {
         val unpackTask = project.tasks.create("unpackServer", UnpackServerTask::class.java).dependsOn(downloadTasks)
         val configureTask = project.tasks.create("configureServer", ConfigureServerTask::class.java).dependsOn(unpackTask)
         project.tasks.create("startServer", Exec::class.java, StartServerAction()).dependsOn(configureTask)
+        project.tasks.withType(Jar::class.java) { configureTask.dependsOn(it) }
     }
 
 }

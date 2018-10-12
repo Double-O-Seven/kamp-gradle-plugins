@@ -53,6 +53,7 @@ compileTestKotlin {
 dependencies {
 
     implementation(
+            "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version",
             "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version",
             'de.undercouch:gradle-download-task:3.4.3',
             'org.apache.commons:commons-lang3:3.8.1',
