@@ -11,6 +11,7 @@ open class ServerStarterPlugin : Plugin<Project> {
     companion object {
 
         const val SERVER_DIRECTORY_NAME = "samp-server"
+        const val SERVER_DOWNLOAD_DIRECTORY_NAME = "tmp"
     }
 
     override fun apply(project: Project) {

@@ -8,9 +8,9 @@ open class DownloadServerAction : Action<Download> {
     override fun execute(download: Download) {
         with(download) {
             val extension = project.extensions.getByType(ServerStarterPluginExtension::class.java)
-            val serverDirectory = project.buildDir.resolve(ServerStarterPlugin.SERVER_DIRECTORY_NAME)
+            val serverDownloadDirectory = project.buildDir.resolve(ServerStarterPlugin.SERVER_DOWNLOAD_DIRECTORY_NAME)
             src(extension.downloadUrl)
-            dest(serverDirectory.resolve(extension.downloadFileName))
+            dest(serverDownloadDirectory.resolve(extension.downloadFileName))
             overwrite(false)
         }
     }

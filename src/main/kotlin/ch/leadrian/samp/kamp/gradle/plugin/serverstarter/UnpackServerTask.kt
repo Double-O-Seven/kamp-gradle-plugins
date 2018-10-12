@@ -14,8 +14,10 @@ open class UnpackServerTask : DefaultTask() {
 
     private val serverDirectory = project.buildDir.toPath().resolve(ServerStarterPlugin.SERVER_DIRECTORY_NAME)
 
+    private val serverDownloadDirectory = project.buildDir.toPath().resolve(ServerStarterPlugin.SERVER_DOWNLOAD_DIRECTORY_NAME)
+
     private val serverDownloadFile: Path
-        get() = serverDirectory.resolve(extension.downloadFileName)
+        get() = serverDownloadDirectory.resolve(extension.downloadFileName)
 
     @InputFile
     fun getInputFile(): File = serverDownloadFile.toFile()
