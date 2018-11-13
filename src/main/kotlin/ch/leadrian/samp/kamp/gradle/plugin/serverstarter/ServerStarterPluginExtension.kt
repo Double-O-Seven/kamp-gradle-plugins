@@ -10,6 +10,10 @@ open class ServerStarterPluginExtension {
 
     val configProperties: MutableMap<String, Any> = mutableMapOf()
 
+    fun configProperty(key: String, value: Any) {
+        configProperties[key] = value
+    }
+
     var windowsServerDownloadUrl: String = "http://files.sa-mp.com/samp037_svr_R2-1-1_win32.zip"
 
     var linuxServerDownloadUrl: String = "http://files.sa-mp.com/samp037svr_R2-1.tar.gz"
@@ -26,6 +30,14 @@ open class ServerStarterPluginExtension {
     var kampPluginBinaryPath: String? = null
 
     val jvmOptions: MutableList<String> = mutableListOf()
+
+    fun jvmOption(value: String) {
+        jvmOptions += value
+    }
+
+    fun jvmOptions(vararg values: String) {
+        jvmOptions += values
+    }
 
     var lanMode: Boolean = false
 

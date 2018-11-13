@@ -16,6 +16,7 @@ import java.nio.file.Paths
 import java.nio.file.StandardCopyOption
 import java.nio.file.StandardOpenOption
 import java.util.stream.Collectors.joining
+import kotlin.streams.toList
 
 open class ConfigureServerTask : DefaultTask() {
 
@@ -91,7 +92,7 @@ open class ConfigureServerTask : DefaultTask() {
 
     private fun copyDependencies() {
         // Need to delete old jars in case they're outdated regarding version
-        Files.list(jarsDirectory).filter { Files.isRegularFile(it) }.forEach { Files.delete(it) }
+        Files.list(jarsDirectory).filter { Files.isRegularFile(it) }.toList().forEach { Files.delete(it) }
         runtimeConfiguration.resolve().forEach {
             val jarFile = it.toPath()
             Files.copy(jarFile, jarsDirectory.resolve(jarFile.fileName))
