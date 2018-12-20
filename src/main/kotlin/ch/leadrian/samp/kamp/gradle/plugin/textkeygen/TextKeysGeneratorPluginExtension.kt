@@ -6,9 +6,9 @@ import java.util.*
 
 open class TextKeysGeneratorPluginExtension {
 
-    var outputDirectory: Any? = null
+    lateinit var outputDirectory: Any
 
-    var resourcesDirectory: Any? = null
+    lateinit var resourcesDirectory: Any
 
     var packageNames: Set<String> = HashSet()
 

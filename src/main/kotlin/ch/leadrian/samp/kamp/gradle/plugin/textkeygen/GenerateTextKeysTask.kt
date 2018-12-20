@@ -1,6 +1,7 @@
 package ch.leadrian.samp.kamp.gradle.plugin.textkeygen
 
 import org.gradle.api.DefaultTask
+import org.gradle.api.internal.file.FileLookup
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectories
 import java.io.File
@@ -10,11 +11,13 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardOpenOption
 import java.util.*
-import java.util.Objects.requireNonNull
 import java.util.regex.Pattern.compile
+import javax.inject.Inject
 import kotlin.streams.toList
 
-open class GenerateTextKeysTask : DefaultTask() {
+open class GenerateTextKeysTask
+@Inject
+constructor(private val fileLookup: FileLookup) : DefaultTask() {
 
     companion object {
 
@@ -24,7 +27,7 @@ open class GenerateTextKeysTask : DefaultTask() {
     @InputFiles
     fun getInputFiles(): List<File> {
         val extension = extension
-        val resourcesDirectoryFile = getFileFromObject(extension.resourcesDirectory)
+        val resourcesDirectoryFile = fileLookup.fileResolver.resolve(extension.resourcesDirectory)
         return extension.packageNames.flatMap { packageName -> getStringsPropertiesFiles(resourcesDirectoryFile, packageName) }
     }
 
@@ -40,7 +43,7 @@ open class GenerateTextKeysTask : DefaultTask() {
 
     private fun generateTextKeys() {
         val extension = extension
-        val resourcesDirectoryFile = getFileFromObject(extension.resourcesDirectory)
+        val resourcesDirectoryFile = fileLookup.fileResolver.resolve(extension.resourcesDirectory)
         extension.packageNames.forEach { packageName ->
             val stringsPropertiesFiles = getStringsPropertiesFiles(resourcesDirectoryFile, packageName)
             try {
@@ -90,15 +93,8 @@ open class GenerateTextKeysTask : DefaultTask() {
         return properties
     }
 
-    private fun getFileFromObject(fileObject: Any?): File {
-        requireNonNull<Any>(fileObject)
-        return if (fileObject is Path) {
-            fileObject.toFile()
-        } else fileObject as? File ?: File(fileObject!!.toString())
-    }
-
     private fun getOutputDirectory(packageName: String): File =
-            File(getFileFromObject(extension.outputDirectory), packageNameToPath(packageName))
+            File(fileLookup.fileResolver.resolve(extension.outputDirectory), packageNameToPath(packageName))
 
     private fun packageNameToPath(packageName: String): String = packageName.replace('.', File.separatorChar)
 
