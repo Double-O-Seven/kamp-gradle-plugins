@@ -10,18 +10,13 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.internal.os.OperatingSystem
 import java.io.File
-import java.nio.file.Files
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.nio.file.StandardCopyOption
-import java.nio.file.StandardOpenOption
-import java.util.stream.Collectors.joining
-import kotlin.streams.toList
+import java.io.FileOutputStream
+import java.io.FileWriter
 
 open class ConfigureServerTask : DefaultTask() {
 
-    private val serverDirectory: Path by lazy {
-        val serverDirectoryBase = project.buildDir.toPath().resolve(ServerStarterPlugin.SERVER_DIRECTORY_NAME)
+    private val serverDirectory: File by lazy {
+        val serverDirectoryBase = project.buildDir.resolve(ServerStarterPlugin.SERVER_DIRECTORY_NAME)
         if (OperatingSystem.current().isLinux) {
             serverDirectoryBase.resolve("samp03")
         } else {
@@ -35,17 +30,17 @@ open class ConfigureServerTask : DefaultTask() {
     private val launchDirectory = kampDirectory.resolve("launch")
     private val jarsDirectory = launchDirectory.resolve("jars")
     private val pluginsDirectory = serverDirectory.resolve("plugins")
-    private val serverCfgFile: Path = serverDirectory.resolve("server.cfg")
+    private val serverCfgFile = serverDirectory.resolve("server.cfg")
     private val jvmOptsFile = launchDirectory.resolve("jvmopts.txt")
     private val configPropertiesFile = kampDirectory.resolve("config.properties")
-    private val kampPluginBinaryFile: Path
-        get() = Paths.get(extension.kampPluginBinaryPath ?: throw IllegalStateException("kampPluginBinaryPath was not set"))
+    private val kampPluginBinaryFile: File
+        get() = File(extension.kampPluginBinaryPath ?: throw IllegalStateException("kampPluginBinaryPath was not set"))
 
     private val extension: ServerStarterPluginExtension
         get() = project.extensions.getByType(ServerStarterPluginExtension::class.java)
 
     private val runtimeConfiguration: Configuration
-        get() = project.configurations.getByName("runtime")
+        get() = project.configurations.getByName("runtimeClasspath")
 
     private val jarTask: Jar
         get() = (project.tasks.getByName("jar") as Jar)
@@ -53,23 +48,23 @@ open class ConfigureServerTask : DefaultTask() {
     @InputFiles
     fun getInputFiles(): List<File> {
         val inputFiles: MutableList<File> = mutableListOf()
-        inputFiles += serverCfgFile.toFile()
+        inputFiles += serverCfgFile
         inputFiles += runtimeConfiguration.resolve()
-        inputFiles += jarTask.archivePath
+        jarTask.archiveFile.orNull?.let { inputFiles += it.asFile }
         return inputFiles
     }
 
     @OutputFiles
     fun getOutputFiles(): List<File> {
         val outputFiles: MutableList<File> = mutableListOf()
-        outputFiles += serverCfgFile.toFile()
-        outputFiles += kampPluginBinaryFile.toFile()
-        outputFiles += kampAmxFile.toFile()
+        outputFiles += serverCfgFile
+        outputFiles += kampPluginBinaryFile
+        outputFiles += kampAmxFile
         return outputFiles
     }
 
     @OutputDirectory
-    fun getOutputDirectory(): File = kampDirectory.toFile()
+    fun getOutputDirectory(): File = kampDirectory
 
     @TaskAction
     fun configureServer() {
@@ -83,26 +78,29 @@ open class ConfigureServerTask : DefaultTask() {
     }
 
     private fun createDirectories() {
-        Files.createDirectories(kampDirectory)
-        Files.createDirectories(dataDirectory)
-        Files.createDirectories(launchDirectory)
-        Files.createDirectories(jarsDirectory)
-        Files.createDirectories(pluginsDirectory)
+        kampDirectory.mkdirs()
+        dataDirectory.mkdirs()
+        launchDirectory.mkdirs()
+        jarsDirectory.mkdirs()
+        pluginsDirectory.mkdirs()
     }
 
     private fun copyDependencies() {
         // Need to delete old jars in case they're outdated regarding version
-        Files.list(jarsDirectory).filter { Files.isRegularFile(it) }.toList().forEach { Files.delete(it) }
-        runtimeConfiguration.resolve().forEach {
-            val jarFile = it.toPath()
-            Files.copy(jarFile, jarsDirectory.resolve(jarFile.fileName))
+        jarsDirectory.listFiles().filter { it.isFile }.forEach {
+            it.delete()
         }
-        val archivePath = jarTask.archivePath.toPath()
-        Files.copy(archivePath, jarsDirectory.resolve(archivePath.fileName))
+        runtimeConfiguration.resolve().forEach {
+            it.copyTo(jarsDirectory.resolve(it.name))
+        }
+        jarTask.archiveFile.orNull?.let {
+            val archivePath = it.asFile
+            archivePath.copyTo(jarsDirectory.resolve(archivePath.name))
+        }
     }
 
     private fun writeServerCfg() {
-        Files.newBufferedWriter(serverCfgFile, StandardOpenOption.WRITE, StandardOpenOption.CREATE).use { writer ->
+        FileWriter(serverCfgFile).use { writer ->
             with(writer) {
                 write("echo Executing Server Config...\n")
                 write("lanmode ${extension.lanMode.toInt()}\n")
@@ -111,7 +109,7 @@ open class ConfigureServerTask : DefaultTask() {
                 write("port ${extension.port}\n")
                 write("hostname ${extension.hostName}\n")
                 write("gamemode0 kamp 1\n")
-                val pluginFileName = kampPluginBinaryFile.fileName.toString()
+                val pluginFileName = kampPluginBinaryFile.name
                 when {
                     OperatingSystem.current().isWindows -> {
                         val pluginName = pluginFileName.replace(".dll", "", ignoreCase = true)
@@ -137,11 +135,11 @@ open class ConfigureServerTask : DefaultTask() {
     private fun Boolean.toInt(): Int = if (this) 1 else 0
 
     private fun createConfigPropertiesFile() {
-        Files.newBufferedWriter(configPropertiesFile, StandardOpenOption.WRITE, StandardOpenOption.CREATE).use { writer ->
+        FileWriter(configPropertiesFile).use { writer ->
             with(writer) {
                 val gameModeClassName = extension.gameModeClassName ?: throw IllegalStateException("gameModeClassName was not set")
                 write("kamp.gamemode.class.name=$gameModeClassName\n")
-                val pluginName = kampPluginBinaryFile.fileName.toString().replace(".dll", "", ignoreCase = true)
+                val pluginName = kampPluginBinaryFile.name.replace(".dll", "", ignoreCase = true)
                 write("kamp.plugin.name=$pluginName\n")
                 extension.configProperties.forEach { key, value ->
                     write("$key=$value\n")
@@ -151,7 +149,7 @@ open class ConfigureServerTask : DefaultTask() {
     }
 
     private fun createJvmOptsFile() {
-        Files.newBufferedWriter(jvmOptsFile, StandardOpenOption.WRITE, StandardOpenOption.CREATE).use { writer ->
+        FileWriter(jvmOptsFile).use { writer ->
             with(writer) {
                 val classPath = buildClassPath()
                 write("-Djava.class.path=$classPath\n")
@@ -164,20 +162,20 @@ open class ConfigureServerTask : DefaultTask() {
     }
 
     private fun buildClassPath(): String =
-            Files
-                    .list(jarsDirectory)
-                    .filter { Files.isRegularFile(it) }
-                    .map { serverDirectory.relativize(it).toString() }
+            jarsDirectory
+                    .listFiles()
+                    .filter { it.isFile }
+                    .map { it.relativeTo(serverDirectory).toString() }
                     .filter { it.endsWith(".jar", ignoreCase = true) }
-                    .collect(joining(";"))
+                    .joinToString(";")
 
     private fun copyPluginBinaryFile() {
-        Files.copy(kampPluginBinaryFile, pluginsDirectory.resolve(kampPluginBinaryFile.fileName), StandardCopyOption.REPLACE_EXISTING)
+        kampPluginBinaryFile.copyTo(pluginsDirectory.resolve(kampPluginBinaryFile.name), overwrite = true)
     }
 
     private fun copyPawnScript() {
         val kampAmx = Resources.toByteArray(Resources.getResource(this::class.java, "kamp.amx"))
-        Files.newOutputStream(kampAmxFile, StandardOpenOption.CREATE, StandardOpenOption.WRITE).use {
+        FileOutputStream(kampAmxFile).use {
             it.write(kampAmx)
         }
     }
