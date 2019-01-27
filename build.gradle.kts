@@ -1,6 +1,4 @@
-val version: String by project
-
-setVersion(version)
+import groovy.lang.Closure
 
 buildscript {
     dependencies {
@@ -17,7 +15,7 @@ plugins {
     java
     kotlin("jvm") version "1.3.11"
     maven
-    idea
+    id("com.palantir.git-version") version "0.12.0-rc2"
 }
 
 repositories {
@@ -40,6 +38,10 @@ dependencies {
 
     testRuntimeOnly(group = "org.junit.jupiter", name = "junit-jupiter-engine", version = "5.3.2")
 }
+
+val gitVersion: Closure<String> by extra
+
+version = gitVersion()
 
 group = "ch.leadrian.samp.kamp"
 
