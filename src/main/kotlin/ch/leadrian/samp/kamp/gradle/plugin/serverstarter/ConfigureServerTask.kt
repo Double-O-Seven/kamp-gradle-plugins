@@ -198,7 +198,7 @@ open class ConfigureServerTask : DefaultTask() {
                     .filter { it.isFile }
                     .map { it.relativeTo(serverDirectory).toString() }
                     .filter { it.endsWith(".jar", ignoreCase = true) }
-                    .joinToString(";")
+                    .joinToString(File.pathSeparator)
 
     private fun copyKampPluginFile() {
         copyResource("lib/${extension.operatingSystem.familyName}/$kampPluginFileName", kampPluginFile)
