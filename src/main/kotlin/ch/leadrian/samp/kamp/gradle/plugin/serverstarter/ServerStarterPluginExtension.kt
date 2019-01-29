@@ -4,6 +4,7 @@ import org.apache.commons.lang3.RandomStringUtils
 import org.gradle.internal.os.OperatingSystem
 import java.net.URI
 
+@Suppress("unused", "MemberVisibilityCanBePrivate")
 open class ServerStarterPluginExtension {
 
     var gameModeClassName: String? = null
@@ -14,20 +15,21 @@ open class ServerStarterPluginExtension {
         configProperties[key] = value
     }
 
+    var operatingSystem: OperatingSystem = OperatingSystem.current()
+
     var windowsServerDownloadUrl: String = "http://files.sa-mp.com/samp037_svr_R2-1-1_win32.zip"
 
     var linuxServerDownloadUrl: String = "http://files.sa-mp.com/samp037svr_R2-1.tar.gz"
 
-    val downloadUrl: String
+    internal val downloadUrl: String
         get() = when {
-            OperatingSystem.current().isWindows -> windowsServerDownloadUrl
-            else -> linuxServerDownloadUrl
+            operatingSystem.isWindows -> windowsServerDownloadUrl
+            operatingSystem.isLinux -> linuxServerDownloadUrl
+            else -> throw UnsupportedOperationException("Unsupported operating system: $operatingSystem")
         }
 
-    val downloadFileName: String
-        get() = URI(downloadUrl).toURL().file.substring(1)
-
-    var kampPluginBinaryPath: String? = null
+    internal val downloadFileName: String
+        get() = URI(downloadUrl).toURL().file.removePrefix("/")
 
     val jvmOptions: MutableList<String> = mutableListOf()
 

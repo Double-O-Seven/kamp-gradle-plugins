@@ -5,43 +5,42 @@ import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import java.io.File
-import java.nio.file.Path
 
 open class UnpackServerTask : DefaultTask() {
 
     private val extension: ServerStarterPluginExtension
         get() = project.extensions.getByType(ServerStarterPluginExtension::class.java)
 
-    private val serverDirectory = project.buildDir.toPath().resolve(ServerStarterPlugin.SERVER_DIRECTORY_NAME)
+    private val serverDirectory = project.buildDir.resolve(ServerStarterPlugin.SERVER_DIRECTORY_NAME)
 
-    private val serverDownloadDirectory = project.buildDir.toPath().resolve(ServerStarterPlugin.SERVER_DOWNLOAD_DIRECTORY_NAME)
+    private val serverDownloadDirectory = project.buildDir.resolve(ServerStarterPlugin.SERVER_DOWNLOAD_DIRECTORY_NAME)
 
-    private val serverDownloadFile: Path
+    private val serverDownloadFile: File
         get() = serverDownloadDirectory.resolve(extension.downloadFileName)
 
     @InputFile
-    fun getInputFile(): File = serverDownloadFile.toFile()
+    fun getInputFile(): File = serverDownloadFile
 
     @OutputDirectory
-    fun getOutputDirectory(): File = serverDirectory.toFile()
+    fun getOutputDirectory(): File = serverDirectory
 
     @TaskAction
     fun unpackServer() {
         project.copy { copy ->
             val archive = serverDownloadFile.let {
                 when {
-                    it.isZipFile() -> project.zipTree(it.toFile())
-                    it.isTarFile() -> project.tarTree(it.toFile())
+                    it.isZipFile() -> project.zipTree(it)
+                    it.isTarFile() -> project.tarTree(it)
                     else -> throw UnsupportedOperationException("Unsupported archive: $it")
                 }
             }
-            copy.from(archive).into(serverDirectory.toFile())
+            copy.from(archive).into(serverDirectory)
         }
     }
 
-    private fun Path.isZipFile(): Boolean = fileNameEndsWith(".zip")
+    private fun File.isZipFile(): Boolean = nameEndsWith(".zip")
 
-    private fun Path.isTarFile(): Boolean = fileNameEndsWith(".tar.gz")
+    private fun File.isTarFile(): Boolean = nameEndsWith(".tar.gz")
 
-    private fun Path.fileNameEndsWith(fileEnding: String) = fileName.toString().endsWith(fileEnding, ignoreCase = true)
+    private fun File.nameEndsWith(fileEnding: String) = name.endsWith(fileEnding, ignoreCase = true)
 }
