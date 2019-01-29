@@ -170,8 +170,7 @@ open class ConfigureServerTask : DefaultTask() {
             with(writer) {
                 val gameModeClassName = extension.gameModeClassName ?: throw IllegalStateException("gameModeClassName was not set")
                 write("kamp.gamemode.class.name=$gameModeClassName\n")
-                val pluginName = kampPluginFileName.replace(".dll", "", ignoreCase = true)
-                write("kamp.plugin.name=$pluginName\n")
+                write("kamp.plugin.name=kamp\n")
                 extension.configProperties.forEach { key, value ->
                     write("$key=$value\n")
                 }
@@ -196,7 +195,7 @@ open class ConfigureServerTask : DefaultTask() {
             jarsDirectory
                     .listFiles()
                     .filter { it.isFile }
-                    .map { it.relativeTo(serverDirectory).toString() }
+                    .map { File(".").resolve(it.relativeTo(serverDirectory)).toString() }
                     .filter { it.endsWith(".jar", ignoreCase = true) }
                     .joinToString(File.pathSeparator)
 
