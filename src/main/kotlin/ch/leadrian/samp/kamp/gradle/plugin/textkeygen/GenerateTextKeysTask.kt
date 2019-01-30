@@ -93,8 +93,10 @@ constructor(private val fileLookup: FileLookup) : DefaultTask() {
         return properties
     }
 
-    private fun getOutputDirectory(packageName: String): File =
-            File(fileLookup.fileResolver.resolve(extension.outputDirectory), packageNameToPath(packageName))
+    private fun getOutputDirectory(packageName: String): File {
+        val outputDirectory = project.buildDir.resolve(TextKeysGeneratorPlugin.GENERATED_SOURCE_DIRECTORY)
+        return File(outputDirectory, packageNameToPath(packageName))
+    }
 
     private fun packageNameToPath(packageName: String): String = packageName.replace('.', File.separatorChar)
 
