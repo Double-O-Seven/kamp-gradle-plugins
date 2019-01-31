@@ -36,6 +36,7 @@ open class GenerateTextKeysTask : DefaultTask() {
                 ?.sourceSets
                 ?.getByName(SourceSet.MAIN_SOURCE_SET_NAME)
                 ?.resources
+                ?.sourceDirectories
                 ?.files
                 .orEmpty()
     }
