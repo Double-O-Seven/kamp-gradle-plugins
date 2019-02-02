@@ -159,6 +159,9 @@ open class ConfigureServerTask : DefaultTask() {
                 write("maxnpc ${extension.maxNPCs}\n")
                 write("logtimeformat ${extension.logTimeFormat}\n")
                 write("language ${extension.language}\n")
+                extension.additionalServerCfgValues.forEach { key, value ->
+                    write("$key $value\n")
+                }
             }
         }
     }

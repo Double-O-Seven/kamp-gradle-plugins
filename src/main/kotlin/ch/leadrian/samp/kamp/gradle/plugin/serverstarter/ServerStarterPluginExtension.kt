@@ -73,4 +73,10 @@ open class ServerStarterPluginExtension {
 
     var language: String = "English"
 
+    val additionalServerCfgValues: MutableMap<String, Any> = mutableMapOf()
+
+    fun additionalServerCfgValue(key: String, value: Any) {
+        additionalServerCfgValues[key] = value
+    }
+
 }
