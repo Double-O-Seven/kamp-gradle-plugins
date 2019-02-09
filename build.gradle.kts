@@ -13,9 +13,7 @@ buildscript {
 
 plugins {
     kotlin("jvm") version "1.3.11"
-    java
     `java-library`
-    maven
     `maven-publish`
     signing
     `build-scan`
