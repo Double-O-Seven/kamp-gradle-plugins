@@ -9,7 +9,7 @@ open class ServerStarterPluginExtension {
 
     var gameModeClassName: String? = null
 
-    val configProperties: MutableMap<String, Any> = mutableMapOf()
+    internal val configProperties: MutableMap<String, Any> = mutableMapOf()
 
     fun configProperty(key: String, value: Any) {
         configProperties[key] = value
@@ -25,6 +25,24 @@ open class ServerStarterPluginExtension {
 
     var windowsKampPluginFile: Any? = null
 
+    private val additionalWindowsPluginFiles: MutableList<Any> = mutableListOf()
+
+    private val additionalLinuxPluginFiles: MutableList<Any> = mutableListOf()
+
+    fun additionalWindowsPlugins(vararg pluginFiles: Any) {
+        additionalWindowsPluginFiles.addAll(pluginFiles)
+    }
+
+    fun additionalLinuxPlugins(vararg pluginFiles: Any) {
+        additionalLinuxPluginFiles.addAll(pluginFiles)
+    }
+
+    internal val additionalPluginFiles: List<Any> = when {
+        operatingSystem.isWindows -> additionalWindowsPluginFiles
+        operatingSystem.isLinux -> additionalLinuxPluginFiles
+        else -> emptyList()
+    }
+
     internal val downloadUrl: String
         get() = when {
             operatingSystem.isWindows -> windowsServerDownloadUrl
@@ -35,7 +53,7 @@ open class ServerStarterPluginExtension {
     internal val downloadFileName: String
         get() = URI(downloadUrl).toURL().file.removePrefix("/")
 
-    val jvmOptions: MutableList<String> = mutableListOf()
+    internal val jvmOptions: MutableList<String> = mutableListOf()
 
     fun jvmOption(value: String) {
         jvmOptions += value
@@ -77,7 +95,7 @@ open class ServerStarterPluginExtension {
 
     var language: String = "English"
 
-    val additionalServerCfgValues: MutableMap<String, Any> = mutableMapOf()
+    internal val additionalServerCfgValues: MutableMap<String, Any> = mutableMapOf()
 
     fun additionalServerCfgValue(key: String, value: Any) {
         additionalServerCfgValues[key] = value

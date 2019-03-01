@@ -68,6 +68,9 @@ constructor(private val fileLookup: FileLookup) : DefaultTask() {
     private val linuxKampPluginFile: File?
         get() = extension.linuxKampPluginFile?.takeIf { extension.operatingSystem.isLinux }?.resolveFile()
 
+    private val additionalPluginFiles: List<File>
+        get() = extension.additionalPluginFiles.map { it.resolveFile() }
+
     private val sampgdkFileName: String
         get() {
             val os = extension.operatingSystem
@@ -91,6 +94,7 @@ constructor(private val fileLookup: FileLookup) : DefaultTask() {
         val inputFiles: MutableList<File> = mutableListOf()
         inputFiles += serverCfgFile
         inputFiles += runtimeConfiguration.resolve()
+        inputFiles += additionalPluginFiles
         jarFiles.forEach { inputFiles += it }
         windowsKampPluginFile?.let { inputFiles += it }
         linuxKampPluginFile?.let { inputFiles += it }
@@ -104,6 +108,7 @@ constructor(private val fileLookup: FileLookup) : DefaultTask() {
         outputFiles += kampPluginFile
         outputFiles += sampgdkFile
         outputFiles += kampAmxFile
+        outputFiles += additionalPluginFiles.map { pluginsDirectory.resolve(it.name) }
         return outputFiles
     }
 
@@ -118,6 +123,7 @@ constructor(private val fileLookup: FileLookup) : DefaultTask() {
         createJvmOptsFile()
         createConfigPropertiesFile()
         copyKampPluginFile()
+        copyAdditionalPluginFiles()
         copySampgdkFile()
         copyKampAmxFile()
     }
@@ -153,13 +159,13 @@ constructor(private val fileLookup: FileLookup) : DefaultTask() {
                 write("port ${extension.port}\n")
                 write("hostname ${extension.hostName}\n")
                 write("gamemode0 kamp 1\n")
-                when {
-                    extension.operatingSystem.isWindows -> {
-                        val pluginName = kampPluginFileName.replace(".dll", "", ignoreCase = true)
-                        write("plugins $pluginName\n")
-                    }
-                    else -> write("plugins $kampPluginFileName\n")
+                val pluginNames = mutableListOf(kampPluginFileName)
+                pluginNames += additionalPluginFiles.map { it.name }
+                val pluginNamesWithoutDll = when {
+                    extension.operatingSystem.isWindows -> pluginNames.map { it.replace(".dll", "", ignoreCase = true) }
+                    else -> pluginNames
                 }
+                write("plugins ${pluginNamesWithoutDll.joinToString(" ")}\n")
                 write("announce ${extension.announce.toInt()}\n")
                 write("chatlogging ${extension.chatLogging.toInt()}\n")
                 write("weburl ${extension.webUrl}\n")
@@ -219,12 +225,20 @@ constructor(private val fileLookup: FileLookup) : DefaultTask() {
         val linuxKampPluginFile = this.linuxKampPluginFile
         when {
             windowsKampPluginFile != null -> project.copy { copy ->
-                copy.from(windowsKampPluginFile).into(kampPluginFile)
+                copy.from(windowsKampPluginFile).rename { kampPluginFileName }.into(pluginsDirectory)
             }
             linuxKampPluginFile != null -> project.copy { copy ->
-                copy.from(linuxKampPluginFile).into(kampPluginFile)
+                copy.from(linuxKampPluginFile).rename { kampPluginFileName }.into(pluginsDirectory)
             }
             else -> copyResource("lib/${extension.operatingSystem.familyName}/$kampPluginFileName", kampPluginFile)
+        }
+    }
+
+    private fun copyAdditionalPluginFiles() {
+        additionalPluginFiles.forEach {
+            project.copy { copy ->
+                copy.from(it).into(pluginsDirectory)
+            }
         }
     }
 
