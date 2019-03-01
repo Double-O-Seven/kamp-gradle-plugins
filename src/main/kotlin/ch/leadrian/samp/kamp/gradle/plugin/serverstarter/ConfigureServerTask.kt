@@ -3,6 +3,7 @@ package ch.leadrian.samp.kamp.gradle.plugin.serverstarter
 import com.google.common.io.Resources
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
+import org.gradle.api.internal.file.FileLookup
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFiles
@@ -11,8 +12,11 @@ import org.gradle.api.tasks.bundling.Jar
 import java.io.File
 import java.io.FileOutputStream
 import java.io.FileWriter
+import javax.inject.Inject
 
-open class ConfigureServerTask : DefaultTask() {
+open class ConfigureServerTask
+@Inject
+constructor(private val fileLookup: FileLookup) : DefaultTask() {
 
     private val extension: ServerStarterPluginExtension
         get() = project.extensions.getByType(ServerStarterPluginExtension::class.java)
@@ -58,6 +62,12 @@ open class ConfigureServerTask : DefaultTask() {
 
     private val kampPluginFile = pluginsDirectory.resolve(kampPluginFileName)
 
+    private val windowsKampPluginFile: File?
+        get() = extension.windowsKampPluginFile?.takeIf { extension.operatingSystem.isWindows }?.resolveFile()
+
+    private val linuxKampPluginFile: File?
+        get() = extension.linuxKampPluginFile?.takeIf { extension.operatingSystem.isLinux }?.resolveFile()
+
     private val sampgdkFileName: String
         get() {
             val os = extension.operatingSystem
@@ -82,6 +92,8 @@ open class ConfigureServerTask : DefaultTask() {
         inputFiles += serverCfgFile
         inputFiles += runtimeConfiguration.resolve()
         jarFiles.forEach { inputFiles += it }
+        windowsKampPluginFile?.let { inputFiles += it }
+        linuxKampPluginFile?.let { inputFiles += it }
         return inputFiles
     }
 
@@ -203,8 +215,20 @@ open class ConfigureServerTask : DefaultTask() {
                     .joinToString(File.pathSeparator)
 
     private fun copyKampPluginFile() {
-        copyResource("lib/${extension.operatingSystem.familyName}/$kampPluginFileName", kampPluginFile)
+        val windowsKampPluginFile = this.windowsKampPluginFile
+        val linuxKampPluginFile = this.linuxKampPluginFile
+        when {
+            windowsKampPluginFile != null -> project.copy { copy ->
+                copy.from(windowsKampPluginFile).into(kampPluginFile)
+            }
+            linuxKampPluginFile != null -> project.copy { copy ->
+                copy.from(linuxKampPluginFile).into(kampPluginFile)
+            }
+            else -> copyResource("lib/${extension.operatingSystem.familyName}/$kampPluginFileName", kampPluginFile)
+        }
     }
+
+    private fun Any.resolveFile(): File = fileLookup.fileResolver.resolve(this)
 
     private fun copySampgdkFile() {
         copyResource("lib/${extension.operatingSystem.familyName}/$sampgdkFileName", sampgdkFile)

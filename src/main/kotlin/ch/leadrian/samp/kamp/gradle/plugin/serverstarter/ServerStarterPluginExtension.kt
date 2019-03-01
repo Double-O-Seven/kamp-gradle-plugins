@@ -21,6 +21,10 @@ open class ServerStarterPluginExtension {
 
     var linuxServerDownloadUrl: String = "http://files.sa-mp.com/samp037svr_R2-1.tar.gz"
 
+    var linuxKampPluginFile: Any? = null
+
+    var windowsKampPluginFile: Any? = null
+
     internal val downloadUrl: String
         get() = when {
             operatingSystem.isWindows -> windowsServerDownloadUrl
