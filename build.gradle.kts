@@ -15,6 +15,7 @@ plugins {
     kotlin("jvm") version "1.3.11"
     `java-library`
     `maven-publish`
+    maven
     signing
     `build-scan`
     id("org.jetbrains.dokka") version "0.9.17"
